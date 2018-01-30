@@ -71,6 +71,8 @@ public class Player : MonoBehaviour
             v = Mathf.Sin(transform.eulerAngles.z * Mathf.Deg2Rad);
         }
 
+        // # GAME FEEL - Rapidly iterate through colors, giving the appearance of a real animation :)
+        // Great for prototypes! Quick way to convey an idea.
         if ( thrust > 0 )
         {
             thruster_anim_index++;
@@ -126,7 +128,7 @@ public class Player : MonoBehaviour
             right_wing_trail.Clear();
         }
 
-
+        
         bool shoot = Input.GetButtonDown("Fire1");
 
         if(shoot)
