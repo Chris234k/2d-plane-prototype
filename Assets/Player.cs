@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     Vector2 gravity = new Vector2(0, -2f);
     float friction = 0.95f;
 
-    // Movement Animations
+    // Movement animations
     public ParticleSystem left_wing_brake, right_wing_brake;
     public TrailRenderer left_wing_trail, right_wing_trail;
     
@@ -39,6 +39,8 @@ public class Player : MonoBehaviour
     //
     void Update()
     {
+        // # GAME FEEL - Inputs come from Unity as value from 0 - 1. We use these as percentages.
+        // Where '0' means unpressed and '1' means fully pressed.
         float raw_h = Input.GetAxisRaw("Horizontal");
         float raw_v = Input.GetAxisRaw("Vertical");
 
@@ -49,10 +51,10 @@ public class Player : MonoBehaviour
         float brake = Input.GetAxis("Brake");
 
         thrust *= 6f;
-        friction = 0.99f - (0.05f * brake);
+        friction = 0.99f - (0.05f * brake); // # GAME FEEL - Full press on trigger results in higher brake
         gravity = new Vector2(0, -2f) * (brake + 0.1f);
 
-        if(brake > 0)
+        if(brake > 0) // # GAME FEEL - Emit particles while braking. We always have trail renderers, but these differentiate movement and braking visually.
         {
             left_wing_brake.Emit(1);
             right_wing_brake.Emit(1);
@@ -83,7 +85,7 @@ public class Player : MonoBehaviour
         }
         thruster.color = thruster_colors[thruster_anim_index];
 
-        accel += new Vector2(h, v) * thrust;
+        accel += new Vector2(h, v) * thrust; // # GAME FEEL - Full press on trigger results in higher thrust (same as above for braking)
         accel += gravity;
         accel *= Time.deltaTime;
 
@@ -145,6 +147,10 @@ public class Player : MonoBehaviour
         right_wing_trail.Clear();
     }
 
+    // Display values on screen
+    // Just an easy way to see what's happening
+    // If this seems weird, just make the variables public and look at them in Unity's Inspector.
+    // 
     // void OnGUI()
     // {
     //     float hor = Input.GetAxis("Horizontal");

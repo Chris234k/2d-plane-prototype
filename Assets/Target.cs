@@ -31,11 +31,17 @@ public class Target : MonoBehaviour
         }
     }
 
+    // # GAME FEEL - A small animation to show that something is occurring.
+    // It's easy to take this sort of thing for granted, but it's often the difference between "what do I do" and "oh, huh, okay"
+    //
+    // Also, don't be like me. Use a tweening engine:
+    // iTween, LeanTween, DOTween, etc will create better looking results with less work.
     IEnumerator Hit()
     {
         float time = 0.1f;
         float elapsed_time = 0;
 
+        // Scale up
         while ( transform.localScale.x < tween_scale.x )
         {
             elapsed_time += Time.deltaTime;
@@ -50,6 +56,7 @@ public class Target : MonoBehaviour
         transform.localScale = start_scale * 2;
         elapsed_time = 0;
 
+        // Scale down
         while ( transform.localScale.x > start_scale.x )
         {
             elapsed_time += Time.deltaTime;
