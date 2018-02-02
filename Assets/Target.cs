@@ -25,7 +25,11 @@ public class Target : MonoBehaviour
 
             StopAllCoroutines();
             transform.localScale = start_scale;
-            StartCoroutine(Hit());
+
+            if (Player.GAME_FEEL)
+            {
+                StartCoroutine(Hit());
+            }
 
             Destroy(proj.gameObject);
         }

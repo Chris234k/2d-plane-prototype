@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static bool GAME_FEEL = false;
+
+    public InputVisualizer visualizer;
+
     // Player physics
     float max_vel = 1.5f;
     Vector2 accel, vel;
@@ -31,6 +35,8 @@ public class Player : MonoBehaviour
     {
         cam_tl = Camera.main.ViewportToWorldPoint(new Vector2(0, 1));
         cam_br = Camera.main.ViewportToWorldPoint(new Vector2(1, 0));
+
+        left_wing_trail.enabled = right_wing_trail.enabled = GAME_FEEL;
     }
 
     // TODO
@@ -39,6 +45,12 @@ public class Player : MonoBehaviour
     //
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            GAME_FEEL = !GAME_FEEL;
+            left_wing_trail.enabled = right_wing_trail.enabled = GAME_FEEL;
+        }
+
         // # GAME FEEL - Inputs come from Unity as value from 0 - 1. We use these as percentages.
         // Where '0' means unpressed and '1' means fully pressed.
         float raw_h = Input.GetAxisRaw("Horizontal");
@@ -54,10 +66,13 @@ public class Player : MonoBehaviour
         friction = 0.99f - (0.05f * brake); // # GAME FEEL - Full press on trigger results in higher brake
         gravity = new Vector2(0, -2f) * (brake + 0.1f);
 
-        if(brake > 0) // # GAME FEEL - Emit particles while braking. We always have trail renderers, but these differentiate movement and braking visually.
+        if (GAME_FEEL)
         {
-            left_wing_brake.Emit(1);
-            right_wing_brake.Emit(1);
+            if (brake > 0) // # GAME FEEL - Emit particles while braking. We always have trail renderers, but these differentiate movement and braking visually.
+            {
+                left_wing_brake.Emit(1);
+                right_wing_brake.Emit(1);
+            }
         }
 
         if ( raw_h != 0 || raw_v != 0 ) // Rotate towards player input (don't rotate without input)
@@ -73,19 +88,22 @@ public class Player : MonoBehaviour
 
         // # GAME FEEL - Rapidly iterate through colors, giving the appearance of a real animation :)
         // Great for prototypes! Quick way to convey an idea.
-        if ( thrust > 0 )
+        if (GAME_FEEL)
         {
-            thruster_anim_index++;
-            if ( thruster_anim_index > thruster_colors.Length - 1 )
+            if (thrust > 0)
             {
-                thruster_anim_index = 1;
+                thruster_anim_index++;
+                if (thruster_anim_index > thruster_colors.Length - 1)
+                {
+                    thruster_anim_index = 1;
+                }
             }
+            else
+            {
+                thruster_anim_index = 0;
+            }
+            thruster.color = thruster_colors[thruster_anim_index];
         }
-        else
-        {
-            thruster_anim_index = 0;
-        }
-        thruster.color = thruster_colors[thruster_anim_index];
 
         accel += new Vector2(h, v) * thrust; // # GAME FEEL - Full press on trigger results in higher thrust (same as above for braking)
         accel += gravity;
@@ -138,6 +156,17 @@ public class Player : MonoBehaviour
             Vector2 dir = (bullet_spawn.position - transform.position).normalized;
             proj.Spawn(dir, vel);
         }
+
+        // # GAME FEEL
+        // I'm really only doing this so you can see what buttons I'm pushing while I'm demoing
+        // Hopefully it helps!
+        InputVisualizer.Inputs current = new InputVisualizer.Inputs();
+        current.horizontal = Input.GetAxis("Horizontal");
+        current.vertical = Input.GetAxis("Vertical");
+        current.thrust = Input.GetAxis("Thrust");
+        current.brake = Input.GetAxis("Brake");
+        current.shoot = Input.GetAxis("Fire1");
+        visualizer.SetCurrent(current);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
